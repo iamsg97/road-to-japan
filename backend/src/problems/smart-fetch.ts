@@ -39,11 +39,6 @@ class TimeoutError extends Error {
 	}
 }
 
-enum ErrorType {
-	TimeoutError = "TimeoutError",
-	ServerError = "ServerError",
-}
-
 function retryFetch(url: URL, config: Omit<FetchConfig, "concurrency">) {
 	const { maxRetries, timeoutMs, signal } = config;
 	async function attempt(count = 0) {
@@ -55,9 +50,13 @@ function retryFetch(url: URL, config: Omit<FetchConfig, "concurrency">) {
 		if (signal) {
 			if (signal.aborted) controller.abort(signal.reason);
 			else {
-				signal.addEventListener("abort", () => {
-					controller.abort(signal.reason);
-				});
+				signal.addEventListener(
+					"abort",
+					() => {
+						controller.abort(signal.reason);
+					},
+					{ once: true },
+				);
 			}
 		}
 		try {
@@ -70,15 +69,20 @@ function retryFetch(url: URL, config: Omit<FetchConfig, "concurrency">) {
 			const data = await response.json();
 			return data;
 		} catch (error) {
+			if (signal.aborted) throw signal.reason ?? error;
+			const isAbortError = (error as Error).name === "AbortError";
+			const isServerError = error instanceof ServerError;
 			console.error("🚀 ~ attempts ~ error:", error);
-			if (error instanceof Error && error.name === ErrorType.TimeoutError) {
+			if (isAbortError || isServerError) {
 				if (count >= maxRetries) {
 					throw error;
 				}
+				const delay = Math.min(2 ** count * SECOND, MAX_LIMIT);
+				await new Promise((resolve) => setTimeout(resolve, delay));
+				return attempt(count + 1);
 			}
-			const delay = Math.min(2 ** (count * 10), MAX_LIMIT);
-			await new Promise((_, reject) => setTimeout(reject, delay));
-			return attempt(count + 1);
+			// for all other errors
+			throw error;
 		} finally {
 			clearTimeout(timeoutId);
 		}
@@ -104,7 +108,7 @@ export async function solution(prop: InputProp) {
 			})
 			.finally(() => executing.delete(promise));
 		executing.add(promise);
-		if (executing.size > concurrency) {
+		if (executing.size >= concurrency) {
 			await Promise.race(executing);
 		}
 	}
