@@ -1,0 +1,50 @@
+{
+	"compilerOptions": {
+		// Language and Environment
+		"target": "ES2022",
+		"lib": ["ES2022", "DOM"],
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+
+		// Emit
+		"outDir": "./dist",
+		"noEmit": true,
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
+		"removeComments": false,
+
+		// Interop Constraints
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+
+		// Type Checking
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+		"noPropertyAccessFromIndexSignature": false,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"exactOptionalPropertyTypes": true,
+		"noUncheckedIndexedAccess": true,
+
+		// Completeness
+		"skipLibCheck": true,
+
+		// Paths for clean imports
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["src/*"],
+			"@utils/*": ["src/utils/*"],
+			"@problems/*": ["src/problems/*"]
+		}
+	},
+	"include": ["src/**/*", "scripts/**/*"],
+	"exclude": ["node_modules", "dist", "coverage"]
+}

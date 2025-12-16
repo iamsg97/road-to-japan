@@ -1,0 +1,35 @@
+{
+  "name": "dsa-practice",
+  "version": "1.0.0",
+  "description": "TypeScript framework for Data Structures & Algorithms practice",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check --write .",
+    "check:ci": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "new": "node --loader ts-node/esm scripts/new-problem.ts",
+    "clean": "rm -rf dist coverage .vitest"
+  },
+  "keywords": ["data-structures", "algorithms", "typescript", "practice", "interview-prep"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.9.3",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "@vitest/ui": "^2.1.6",
+    "eslint": "^9.15.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.6"
+  }
+}
