@@ -1,76 +1,48 @@
+
 /**
- * Problem: Longest Palindromic Substring
- * Difficulty: Medium
+ * Returns the longest palindromic substring using "expand around center".
+ * Concept:
+ * - Every palindrome can be defined by a center and equal mirror expansion on both sides.
+ * - For each index, try both odd-length (center at i) and even-length (center between i and i+1) palindromes.
+ * - Expand outward while characters match, track the longest window seen.
  *
- * Given a string s, return the longest in s.
- * @deprecated
+ * Time: O(n^2) worst case (e.g., "aaaa…a"), Space: O(1).
  */
-
-export function longestPalindromicSubstringDeprecated(s: string): string {
-  for (let length = s.length; length > 0; length--) {
-    for (let start = 0; start <= s.length - length; start++) {
-      const substring = s.substring(start, start + length);
-      if (isValidPalindrome(substring)) {
-        return substring;
-      }
-    }
-  }
-  return '';
-}
-
 export function longestPalindromicSubstring(s: string): string {
-  let maxLeft = 0;
-  let maxRight = 0;
-  for (let i = 0; i < s.length; i++) {
-    // find out the possible palindrome considering event length
-    const [left1, right1] = expandAroundCenter(s, i, i);
-    // find out the possible palindrome considering odd length
-    const [left2, right2] = expandAroundCenter(s, i, i + 1);
+	let windowSize = 0; // Current palindrome length from latest expansion
+	let maxWindowSize = 0; // Best palindrome length found
+	let start = 0; // Start index of best palindrome
 
-    // find the maximum of the two palindromes
-    const length1 = right1 - left1;
-    const length2 = right2 - left2;
+	for (let i = 0; i < s.length; i++) {
+		// Odd-length palindrome with center at i
+		let [left, right] = expand(s, i, i);
+		windowSize = right - left + 1;
+		if (windowSize > maxWindowSize) {
+			maxWindowSize = windowSize;
+			start = left;
+		}
 
-    const [left, right] = length2 > length1 ? [left2, right2] : [left1, right1];
+		// Even-length palindrome with center between i and i+1
+		[left, right] = expand(s, i, i + 1);
+		windowSize = right - left + 1;
+		if (windowSize > maxWindowSize) {
+			maxWindowSize = windowSize;
+			start = left;
+		}
+	}
 
-    // update the max length
-    if (right - left > maxRight - maxLeft) {
-      maxRight = right!;
-      maxLeft = left!;
-    }
-  }
-
-  return s.substring(maxLeft, maxRight);
+	// Slice out the longest palindrome found
+	return s.slice(start, start + maxWindowSize);
 }
 
 /**
- * Expands around the center of a potential palindrome and returns the boundaries.
- *
- * @param s - The input string to search for palindromes
- * @param start - The starting index for expansion (left boundary)
- * @param end - The ending index for expansion (right boundary)
- * @returns A tuple containing exactly 2 numbers: [leftBoundary, rightBoundary] representing the start and end indices of the palindrome
+ * Expand around the given center while characters match.
+ * Returns the inclusive [left, right] bounds of the palindrome after expansion.
  */
-function expandAroundCenter(s: string, start: number, end: number): Array<number> {
-  let left = start;
-  let right = end;
-  while (left >= 0 && right < s.length && s[left] === s[right]) {
-    left--;
-    right++;
-  }
-  return [left + 1, right];
-}
-
-function isValidPalindrome(s: string): boolean {
-  let left = 0;
-  let right = s.length - 1;
-  while (left < right) {
-    if (s[left] !== s[right]) {
-      return false;
-    }
-    left++;
-    right--;
-  }
-
-  return true;
+function expand(s: string, left: number, right: number): [number, number] {
+	while (left > 0 && right < s.length && s[left] === s[right]) {
+		left++;
+		right--;
+	}
+	return [left + 1, right - 1];
 }
